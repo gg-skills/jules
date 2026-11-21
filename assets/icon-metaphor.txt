@@ -1,0 +1,1 @@
+A queue of terminal cards represents coding sessions moving independently from launch to completion.
