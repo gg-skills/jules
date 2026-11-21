@@ -44,8 +44,8 @@ The 30-min stall threshold matches the live observation from this
 session:
 
 ```
-2026-07-28T03:48 test_session (giaco-settings) approved, first progress at 03:48:39
-2026-07-28T03:48 giaco-jules approved, last agent activity 03:54:55 (≈ 6 min later)
+2026-07-28T03:48 test_session (settings-cli) approved, first progress at 03:48:39
+2026-07-28T03:48 jules-cli approved, last agent activity 03:54:55 (≈ 6 min later)
                 ... then silent for 60+ minutes while running npm install + tsx setup
 2026-07-28T04:14 test_session latest progress 04:14:54 — total ~26 min of "stalled" that was actually compiling
 ```
@@ -71,16 +71,16 @@ It:
 4. exits 0 with a summary line (`X to approve, Y alive, Z stalled, W dead,
    V succeeded`)
 
-Sample output (this session, after giaco-skills PR landed):
+Sample output (this session, after skills-cli PR landed):
 
 ```
   TOOL                       STATE                       ACTS  LATEST  PR
   test_session               IN_PROGRESS                   22  14m ago  no-pr
-  giaco-skills               COMPLETED                     50   2m ago  https://github.com/.../pull/1
-  giaco-auth                 AWAITING_PLAN_APPROVAL         7   1m ago  no-pr          ← APPROVE ME
-  giaco-jules                IN_PROGRESS                   22   8m ago  no-pr
-  giaco-tools                IN_PROGRESS                   44   6m ago  no-pr
-  jules-continue-pending     IN_PROGRESS                   49  14m ago  no-pr
+  skills-cli               COMPLETED                     50   2m ago  https://github.com/.../pull/1
+  auth-cli                 AWAITING_PLAN_APPROVAL         7   1m ago  no-pr          ← APPROVE ME
+  jules-cli                IN_PROGRESS                   22   8m ago  no-pr
+  tools-cli                IN_PROGRESS                   44   6m ago  no-pr
+  continue-cli             IN_PROGRESS                   49  14m ago  no-pr
 
 1 to approve, 4 alive, 0 stalled, 0 dead, 1 succeeded
 ```
@@ -109,13 +109,13 @@ Each `progressUpdated` activity carries:
   "createTime": "2026-07-28T03:49:54Z",
   "originator": "agent",
   "progressUpdated": {
-    "title": "Created project structure for `giaco-settings`, moving bash to .bash, ...",
+    "title": "Created project structure for `settings-cli`, moving bash to .bash, ...",
     "artifacts": [
       {
         "changeSet": {
           "gitPatch": {
-            "unidiffPatch": "diff --git a/bin/giaco-settings b/bin/giaco-settings\n...",
-            "suggestedCommitMessage": "feat(giaco-settings): ..."
+            "unidiffPatch": "diff --git a/bin/settings-cli b/bin/settings-cli\n...",
+            "suggestedCommitMessage": "feat(settings-cli): ..."
           }
         }
       }

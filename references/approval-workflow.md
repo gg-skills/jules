@@ -1,7 +1,7 @@
 # Approval workflow — `requirePlanApproval` gotcha
 
 > The single biggest landmine when launching >1 Jules session at a time.
-> Read this before running `bin/launch-ts-conversions.sh`.
+> Set `JULES_COMPANION_DIR` to your Jules companion checkout before running the launcher.
 
 ## TL;DR
 
@@ -111,6 +111,7 @@ mode** for any launch of >1 session — always review plans first.
 ## Pattern: review + batch-approve
 
 ```bash
+cd "${JULES_COMPANION_DIR:?Set JULES_COMPANION_DIR to your companion checkout}" || exit
 # 1. launch
 bin/launch-ts-conversions.sh --require-approval
 
@@ -163,7 +164,6 @@ Anything outside that set: `--require-approval`.
   activity stream (no `planApproved` = dead).
 - `references/state-machine.md` — full state graph; specifically the
   `AWAITING_PLAN_APPROVAL → COMPLETED (without PR)` edge.
-- `~/Projects/giacos-zsh-toolkit/jules/src/transport.ts` — the canonical
-  fix in the toolkit.
+- `$JULES_COMPANION_DIR/jules/src/transport.ts` — the transport fix in your companion checkout.
 - `bin/launch-ts-conversions.sh --help` — `--require-approval` /
   `--auto-approve` flags.

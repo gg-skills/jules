@@ -48,7 +48,7 @@ PROMPTS_TSV
 
 REQUIRES
   - jules CLI in PATH or JULES_BIN set
-  - JULES_API_KEY in env
+  - JULES_API_KEY in the environment or a shell file set by JULES_ENV_FILE
 EOF
 			exit 0
 			;;
@@ -69,15 +69,13 @@ if [[ -z "$JULES_BIN" ]]; then
 	exit 2
 fi
 
-if [[ -z "${JULES_API_KEY:-}" ]]; then
-	if [[ -f "$HOME/.config/giaco/secrets.zsh" ]]; then
-		# shellcheck disable=SC1090
-		source "$HOME/.config/giaco/secrets.zsh"
-	fi
+if [[ -z "${JULES_API_KEY:-}" && -n "${JULES_ENV_FILE:-}" && -f "$JULES_ENV_FILE" ]]; then
+	# shellcheck disable=SC1090
+	source "$JULES_ENV_FILE"
 fi
 
 if [[ -z "${JULES_API_KEY:-}" ]]; then
-	echo "launch-fleet.sh: JULES_API_KEY is not set" >&2
+	echo "launch-fleet.sh: JULES_API_KEY is not set (export it or set JULES_ENV_FILE)" >&2
 	exit 2
 fi
 

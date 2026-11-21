@@ -115,10 +115,11 @@ state: AWAITING_PLAN_APPROVAL                  ← STOPS HERE
 The minimax step — *always* approve within ~5 minutes of
 `planGenerated` or relaunch.
 
-Pattern (from the toolkit's
-[`bin/launch-ts-conversions.sh`](https://github.com/gabrielgiacomini/giacos-zsh-toolkit/blob/main/bin/launch-ts-conversions.sh)):
+Set `JULES_COMPANION_DIR` to the root of your Jules companion checkout
+before running the fleet launcher:
 
 ```bash
+cd "${JULES_COMPANION_DIR:?Set JULES_COMPANION_DIR to your companion checkout}" || exit
 # launch with approval required
 bin/launch-ts-conversions.sh --require-approval
 # poll: first poll fires immediately; approve loop kicks off when state hits AWAITING_PLAN_APPROVAL
@@ -160,10 +161,10 @@ session with state, activity count, last activity age, and PR URL.
 Sample output:
 
 ```
-  test_session (giaco-settings)      IN_PROGRESS    acts=22  latest=12m ago  pr=no-pr
-  giaco-skills                       COMPLETED      acts=50  latest=2m ago   pr=https://github.com/.../pull/1
-  giaco-auth                         AWAITING_PLAN_APPROVAL               pr=no-pr   ← APPROVE ME
-  giaco-jules                        IN_PROGRESS    acts=22  latest=8m ago  pr=no-pr
+  test_session (settings-cli)      IN_PROGRESS    acts=22  latest=12m ago  pr=no-pr
+  skills-cli                       COMPLETED      acts=50  latest=2m ago   pr=https://github.com/.../pull/1
+  auth-cli                         AWAITING_PLAN_APPROVAL               pr=no-pr   ← APPROVE ME
+  jules-cli                        IN_PROGRESS    acts=22  latest=8m ago  pr=no-pr
 ```
 
 ## Nudging stalled sessions
@@ -230,7 +231,8 @@ PR review checklist for the bash → TypeScript pattern (carry across):
 ## Quick commands
 
 ```bash
-# launch a fleet (toolkit's helper)
+cd "${JULES_COMPANION_DIR:?Set JULES_COMPANION_DIR to your companion checkout}" || exit
+# launch a fleet from your companion checkout
 bin/launch-ts-conversions.sh --require-approval   # 6 sessions in parallel
 bin/launch-ts-conversions.sh --auto-approve       # 6 in parallel, auto-approve plans
 bin/launch-ts-conversions.sh --status             # poll current
@@ -249,29 +251,28 @@ curl -s "https://jules.googleapis.com/v1alpha/sessions/$sid" \
 
 ## Operational examples (this rollout)
 
-These are real numbers from running the toolkit's
-[`bin/launch-ts-conversions.sh --require-approval`](https://github.com/gabrielgiacomini/giacos-zsh-toolkit/blob/main/bin/launch-ts-conversions.sh)
-on 2026-07-28 (bash → TypeScript for 6 installer scripts):
+These timings came from a six-session Bash-to-TypeScript rollout
+with the companion fleet launcher in `--require-approval` mode. The
+session and tool identifiers are illustrative.
 
 | Session | Tool | Launch → first activity | Approved → IN_PROGRESS | IN_PROGRESS → COMPLETED |
 |---------|------|----:|----:|----:|
-| 7042453432779327566 | giaco-skills | 90 s | <1 min | 30 min (PR #1 opened) |
-| 10208992711107907349 | giaco-auth | 60 s | <1 min | *stalled at 6 acts; nudge at 12 min unstuck it* |
-| 13518568020600741690 | giaco-jules | 60 s | <1 min | long-running, 60+ min |
-| 4127783617467485739 | giaco-tools | 60 s | <1 min | long-running, 60+ min |
-| 17247954878384851832 | jules-continue-pending | 60 s | <1 min | long-running, 60+ min |
-| 2508381101090320408 | giaco-settings (test) | 60 s | <1 min | *stalled at 21 acts for 35 min, unstuck by nudge* |
+| example-1 | skills-cli | 90 s | <1 min | 30 min (PR #1 opened) |
+| example-2 | auth-cli | 60 s | <1 min | *stalled at 6 acts; nudge at 12 min unstuck it* |
+| example-3 | jules-cli | 60 s | <1 min | long-running, 60+ min |
+| example-4 | tools-cli | 60 s | <1 min | long-running, 60+ min |
+| example-5 | continue-cli | 60 s | <1 min | long-running, 60+ min |
+| example-6 | settings-cli (test) | 60 s | <1 min | *stalled at 21 acts for 35 min, unstuck by nudge* |
 
 Lessons encoded in the prompts and the launcher:
-- `bin/ts-conversion-prompts/*.txt` carries the "use node:test, not
-  vitest" + `tooling/eslint.config.ts` reference, so we never have to
-  re-derive the conventions from scratch per session.
-- `bin/launch-ts-conversions.sh`'s `--require-approval` is the only safe
+- Keep the test runner (`node:test`) and the project’s shared ESLint
+  config in the launcher’s prompt templates to reuse the same conventions
+  across sessions.
+- The companion launcher's `--require-approval` is the only safe
   mode for launching >1 at once — auto-approve silently wastes quota on
   re-launches when plans turn out to be wrong.
-- `bin/launch-ts-conversions.sh --status` is the daily-driver poller; it
-  calls `jules status --session $sid` and falls back to REST when the
-  CLI's state cache is stale.
+- The companion launcher’s `--status` mode calls `jules status --session $sid`
+  and falls back to REST when the CLI’s state cache is stale.
 
 ## Companion artefacts
 
@@ -290,20 +291,16 @@ Lessons encoded in the prompts and the launcher:
 
 ## Cross-references
 
-- `~/Projects/gg-skills/skills/git-submodules/SKILL.md` — for managing
-  the GG skills repo as submodules (each skill is its own git repo).
-- `~/Projects/gg-skills/skills/cognitive-complexity/SKILL.md` — for the
-  SonarJS cognitive-complexity threshold (30) that the conventions in
-  the bash → TypeScript prompts enforce.
-- `~/Projects/gg-skills/skills/ts-symbol-clarity/SKILL.md` — for the
-  naming review of the new TypeScript packages after PRs land.
-- `~/Projects/gg-skills/skills/eslint-inventory/SKILL.md` — for the
-  shared eslint config at `tooling/eslint.config.ts`.
+- [Git submodules](https://github.com/gg-skills/git-submodules) — for managing
+  individual skill repositories as submodules.
+- Apply the SonarJS cognitive-complexity threshold of 30 in Bash-to-TypeScript
+  conversion prompts.
+- Review TypeScript symbol names in new packages after PRs land.
+- Reference your project’s shared ESLint config in the conversion prompts.
 
 ## Working directory
 
-This skill is part of the `gg-skills` monorepo (a git-superproject with
-each skill as a submodule under `skills/`). The Jules-related kernel —
-`jules/src/transport.ts` — lives in
-`~/Projects/giacos-zsh-toolkit/` and is symlinked into the user's pi
-workspace at `~/.pi/agent/extensions/jules`.
+Set `JULES_COMPANION_DIR` to the root of your Jules companion checkout.
+The transport source is at `$JULES_COMPANION_DIR/jules/src/transport.ts`.
+If you use the pi extension, configure it to load from your companion
+checkout.

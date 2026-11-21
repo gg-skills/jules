@@ -14,8 +14,8 @@ sessions.
    launch hangs at `AWAITING_PLAN_APPROVAL` until you either pass
    `--require-approval` explicitly or push the auto-approve through
    `jules/src/transport.ts`. (The transport fix lives in the
-   `~/Projects/giacos-zsh-toolkit/jules` package; this skill is the
-   operational complement.)
+   companion package at `$JULES_COMPANION_DIR/jules`, with the checkout
+   path set as described under [Companion code](#companion-code).)
 2. **Approval workflow** — the exact `jules approve --session <id>`
    sequencing that keeps a 6-session fleet alive.
 3. **Liveness vs stall** — when `state: IN_PROGRESS` is doing real work
@@ -49,9 +49,7 @@ mkdir -p ~/.claude/skills
 git -C ~/.claude/skills clone git@github.com:gg-skills/jules.git
 ```
 
-Restart your agent or reload skills after installation. See the parent
-[`skills` catalog repo](https://github.com/gg-skills/skills) for the
-full catalog.
+Restart your agent or reload skills after installation. Browse public skills on the [GG Skills organization profile](https://github.com/gg-skills).
 
 ## When to use
 
@@ -72,7 +70,7 @@ Skip this skill for:
 
 - A single interactive Jules session — handle directly.
 - Questions about the `jules` CLI surface itself — open
-  `~/Projects/giacos-zsh-toolkit/jules/src/cli.ts`.
+  `$JULES_COMPANION_DIR/jules/src/cli.ts`.
 - Other async-coding agents (Devin, Codex background, Factory, Aider).
 
 ## How it operates
@@ -189,31 +187,34 @@ watch -n 60 .agents/skills/jules/scripts/monitor.sh .jules-fleet-ids
 gh pr list --repo OWNER/REPO --state open --json number,title | jq
 ```
 
-## Companion skills
+## Companion guidance
 
-- `ts-symbol-clarity` — for the naming review of the new TypeScript
-  packages after PRs land.
-- `eslint-inventory` — for the shared eslint config at
-  `tooling/eslint.config.ts` that new packages should reference.
-- `cognitive-complexity` — for the SonarJS `cognitive-complexity`
-  threshold (30) the conventions enforce.
-- `ts-file-overviews` — for the `@fileoverview` + `@see` JSDoc
+- Review TypeScript symbol names in new packages after PRs land.
+- Use your project’s shared ESLint config in new packages.
+- Apply the SonarJS `cognitive-complexity` threshold of 30 used in the
+  conversion prompts.
+- [TypeScript file overviews](https://github.com/gg-skills/ts-file-overviews) — for the `@fileoverview` + `@see` JSDoc
   convention this skill's transport fix expects.
 
 ## Companion code
 
-- `~/Projects/giacos-zsh-toolkit/jules/src/transport.ts` — the
+Set `JULES_COMPANION_DIR` to the root of your Jules companion checkout
+before following these examples. The bundled scripts read `JULES_API_KEY`
+from the environment. To load the exported key from a local Bash file, set
+`JULES_ENV_FILE` to that file’s path.
+
+- `$JULES_COMPANION_DIR/jules/src/transport.ts` — the
   `requireApproval` fix that this skill relies on.
-- `~/Projects/giacos-zsh-toolkit/bin/launch-ts-conversions.sh` —
+- `$JULES_COMPANION_DIR/bin/launch-ts-conversions.sh` —
   the concrete example of a fleet launcher; pattern-match this when
   you build your own.
-- `~/Projects/giacos-zsh-toolkit/bin/ts-conversion-prompts/*.txt` —
+- `$JULES_COMPANION_DIR/bin/ts-conversion-prompts/*.txt` —
   the six template prompts that the launch script reads, useful as
   starting points for your own batches.
 
 ## Cross-references
 
-- `~/Projects/gg-skills/skills/git-submodules/SKILL.md` — for
+- [Git submodules](https://github.com/gg-skills/git-submodules) — for
   managing this skill repo as a submodule of your own monorepo.
 
 ## Resources

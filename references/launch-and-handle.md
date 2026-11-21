@@ -44,10 +44,10 @@ in your registry.
 
 ## Step 2 — launch
 
-Use the toolkit's helper:
+Set `JULES_COMPANION_DIR` to your Jules companion checkout and run its launcher:
 
 ```bash
-cd ~/Projects/giacos-zsh-toolkit
+cd "${JULES_COMPANION_DIR:?Set JULES_COMPANION_DIR to your companion checkout}" || exit
 bin/launch-ts-conversions.sh --require-approval   # 6 parallel sessions
 ```
 
@@ -173,7 +173,7 @@ gh pr view 1 --repo OWNER/REPO --json files,additions \
   "state": "COMPLETED",
   "url": "https://jules.google.com/session/6164447402217052381",
   "prUrl": "https://github.com/.../pull/1",
-  "prTitle": "feat(giaco-settings): convert bash to strict TypeScript",
+  "prTitle": "feat(settings-cli): convert bash to strict TypeScript",
   "prDescription": "...",
   "diffSummary": { "fileCount": 12, "bytes": 8731 },
   "suggestedCommitMessage": "..."

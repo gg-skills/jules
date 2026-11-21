@@ -16,17 +16,16 @@
 #   2  bad arguments (missing JULES_API_KEY, missing ids file)
 #
 # REQUIRES
-#   - JULES_API_KEY in env (sourced from ~/.config/giaco/secrets.zsh or
-#     wherever the kit expects it)
+#   - JULES_API_KEY in the environment or a shell file set by JULES_ENV_FILE
 #   - curl, jq, python3
 #
 # OUTPUT (columns: tool, state, acts, last-age, pr, flag)
 #   TOOL                                  STATE                       ACTS  LAST-AGE  PR                                                FLAG
 #   test_session                          IN_PROGRESS                   22   14m ago  no-pr                                            (none)
-#   giaco-skills                          COMPLETED                     50    2m ago  https://github.com/.../pull/1                     (succeeded)
-#   giaco-auth                            AWAITING_PLAN_APPROVAL         7    1m ago  no-pr                                            ← APPROVE ME
-#   giaco-jules                           IN_PROGRESS                   22    8m ago  no-pr                                            (none)
-#   giaco-tools                           IN_PROGRESS                   44    6m ago  no-pr                                            (none)
+#   skills-cli                          COMPLETED                     50    2m ago  https://github.com/.../pull/1                     (succeeded)
+#   auth-cli                            AWAITING_PLAN_APPROVAL         7    1m ago  no-pr                                            ← APPROVE ME
+#   jules-cli                           IN_PROGRESS                   22    8m ago  no-pr                                            (none)
+#   tools-cli                           IN_PROGRESS                   44    6m ago  no-pr                                            (none)
 #
 # @see ../SKILL.md — how to interpret this output
 # @see ../references/monitoring.md — liveness-vs-stall heuristic
@@ -39,15 +38,13 @@ IDS_FILE="${1:-${JULES_IDS_FILE:-${PWD}/.jules-fleet-ids}}"
 API_BASE="https://jules.googleapis.com/v1alpha"
 PAGE_SIZE=100
 
-if [[ -z "${JULES_API_KEY:-}" ]]; then
-	if [[ -f "$HOME/.config/giaco/secrets.zsh" ]]; then
-		# shellcheck disable=SC1090
-		source "$HOME/.config/giaco/secrets.zsh"
-	fi
+if [[ -z "${JULES_API_KEY:-}" && -n "${JULES_ENV_FILE:-}" && -f "$JULES_ENV_FILE" ]]; then
+	# shellcheck disable=SC1090
+	source "$JULES_ENV_FILE"
 fi
 
 if [[ -z "${JULES_API_KEY:-}" ]]; then
-	echo "monitor.sh: JULES_API_KEY is not set (source ~/.config/giaco/secrets.zsh)" >&2
+	echo "monitor.sh: JULES_API_KEY is not set (export it or set JULES_ENV_FILE)" >&2
 	exit 2
 fi
 
